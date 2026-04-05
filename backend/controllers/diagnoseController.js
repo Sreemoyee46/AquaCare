@@ -38,18 +38,20 @@ Respond ONLY in this JSON format (no markdown, no extra text):
 
 const runDiagnosis = async (req, res) => {
   try {
-    const { tankId, symptoms } = req.body;
+    const { tankId, symptoms, fishName } = req.body;
     if (!symptoms || symptoms.length === 0)
       return res.status(400).json({ message: 'Please provide at least one symptom' });
 
     const tank = await Tank.findOne({ _id: tankId, user: req.user._id });
     if (!tank) return res.status(404).json({ message: 'Tank not found' });
 
-    const result = await diagnoseWithAI(tank.fishName, symptoms);
+    const targetFishName = fishName || tank.fishName || 'Unknown Fish';
+
+    const result = await diagnoseWithAI(targetFishName, symptoms);
 
     const diagnosis = await Diagnosis.create({
       tank: tankId, user: req.user._id,
-      fishName: tank.fishName, symptoms,
+      fishName: targetFishName, symptoms,
       disease: result.disease,
       confidence: result.confidence,
       dos: result.dos,

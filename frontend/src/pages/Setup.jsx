@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { useTank } from '../context/TankContext'
@@ -36,22 +36,62 @@ const diffColor = { Beginner:'var(--green)', Intermediate:'var(--amber)', Expert
 
 export default function Setup() {
   const [step, setStep] = useState(1)
-  const [selectedFish, setSelectedFish] = useState(null)
+  const [fishes, setFishes] = useState({}) // { fishId: quantity }
   const [form, setForm] = useState({ name:'', size:'Medium (20–60L)', waterType:'Freshwater' })
   const [loading, setLoading] = useState(false)
-  const { addTank } = useTank()
+  const { addTank, updateTank, tanks } = useTank()
   const navigate = useNavigate()
+  const { id } = useParams()
+  const isEditing = !!id
+
+  useEffect(() => {
+    if (isEditing && tanks.length > 0) {
+      const existing = tanks.find(t => t._id === id)
+      if (existing) {
+        setForm({ name: existing.name, size: existing.size, waterType: existing.waterType })
+        const currFishes = {}
+        existing.fishes?.forEach(f => {
+          currFishes[f.fishId] = f.quantity || 1
+        })
+        setFishes(currFishes)
+      }
+    }
+  }, [id, tanks, isEditing])
+
+  const totalFishes = Object.values(fishes).reduce((a, b) => a + b, 0)
+
+  const updateFish = (id, amount) => {
+    setFishes(prev => {
+      const current = prev[id] || 0
+      const next = current + amount
+      if (next <= 0) {
+        const copy = { ...prev }
+        delete copy[id]
+        return copy
+      }
+      return { ...prev, [id]: next }
+    })
+  }
 
   const handleFinish = async () => {
-    if (!selectedFish) { toast.error('Please select a fish'); return }
+    if (totalFishes === 0) { toast.error('Please add at least one fish'); return }
     if (!form.name) { toast.error('Please enter a tank name'); return }
     setLoading(true)
     try {
-      await addTank({ fishId: selectedFish.id, fishName: selectedFish.name, fishEmoji: selectedFish.emoji, ...form })
-      toast.success('🎉 Tank created successfully!')
+      const fishesPayload = Object.entries(fishes).map(([fid, quantity]) => {
+        const dbF = FISH_DB.find(x => x.id === fid)
+        return { fishId: fid, name: dbF.name, emoji: dbF.emoji, quantity }
+      })
+      if (isEditing) {
+        await updateTank(id, { fishes: fishesPayload, ...form })
+        toast.success('💾 Tank updated successfully!')
+      } else {
+        await addTank({ fishes: fishesPayload, ...form })
+        toast.success('🎉 Tank created successfully!')
+      }
       navigate('/dashboard')
     } catch (err) {
-      toast.error('Failed to create tank')
+      toast.error(isEditing ? 'Failed to update tank' : 'Failed to create tank')
     } finally {
       setLoading(false)
     }
@@ -60,8 +100,8 @@ export default function Setup() {
   return (
     <div style={{paddingTop:80,minHeight:'100vh',padding:'80px 24px 40px'}}>
       <div style={{maxWidth:680,margin:'0 auto'}}>
-        <h2 style={{fontSize:'1.8rem',marginBottom:8}}>Set Up Your Tank 🐟</h2>
-        <p style={{color:'var(--text2)',marginBottom:24}}>Tell us about your aquarium and we'll personalise everything.</p>
+        <h2 style={{fontSize:'1.8rem',marginBottom:8}}>{isEditing ? 'Edit Your Tank ✏️' : 'Set Up Your Tank 🐟'}</h2>
+        <p style={{color:'var(--text2)',marginBottom:24}}>{isEditing ? 'Update your fish populations or tank details below.' : 'Tell us about your aquarium and we\'ll personalise everything.'}</p>
 
         {/* Step indicators */}
         <div style={{display:'flex',gap:8,marginBottom:28}}>
@@ -73,19 +113,35 @@ export default function Setup() {
         {/* Step 1 */}
         {step === 1 && (
           <div>
-            <p style={{fontSize:'0.85rem',color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:16}}>Step 1 — Choose your fish</p>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(130px,1fr))',gap:10,maxHeight:420,overflowY:'auto',marginBottom:20}}>
-              {FISH_DB.map(f => (
-                <div key={f.id} onClick={() => setSelectedFish(f)}
-                  style={{background:'var(--card)',border:`1.5px solid ${selectedFish?.id===f.id?'var(--cyan)':'var(--border)'}`,borderRadius:'var(--radius2)',padding:'14px 10px',textAlign:'center',cursor:'pointer',transition:'all 0.2s',background:selectedFish?.id===f.id?'rgba(0,212,255,0.08)':'var(--card)'}}>
-                  <div style={{fontSize:'1.8rem',marginBottom:6}}>{f.emoji}</div>
-                  <div style={{fontSize:'0.82rem',fontWeight:600,marginBottom:3}}>{f.name}</div>
-                  <div style={{fontSize:'0.7rem',color:diffColor[f.difficulty]}}>{f.difficulty}</div>
-                  <div style={{fontSize:'0.7rem',color:'var(--text3)'}}>{f.water}</div>
-                </div>
-              ))}
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',marginBottom:16}}>
+              <p style={{fontSize:'0.85rem',color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.06em'}}>Step 1 — Choose your fish</p>
+              <div style={{fontSize:'0.85rem',color:'var(--cyan)',fontWeight:600}}>{totalFishes} fish selected</div>
             </div>
-            <button onClick={() => { if(!selectedFish){toast.error('Select a fish first');return} setStep(2) }}
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(130px,1fr))',gap:10,maxHeight:420,overflowY:'auto',marginBottom:20,paddingRight:4}}>
+              {FISH_DB.map(f => {
+                const qty = fishes[f.id] || 0
+                return (
+                  <div key={f.id}
+                    style={{background:qty>0?'rgba(0,212,255,0.08)':'var(--card)',border:`1.5px solid ${qty>0?'var(--cyan)':'var(--border)'}`,borderRadius:'var(--radius2)',padding:'14px 10px',textAlign:'center',transition:'all 0.2s',position:'relative'}}>
+                    <div style={{fontSize:'1.8rem',marginBottom:6}}>{f.emoji}</div>
+                    <div style={{fontSize:'0.82rem',fontWeight:600,marginBottom:3}}>{f.name}</div>
+                    <div style={{fontSize:'0.7rem',color:diffColor[f.difficulty]}}>{f.difficulty}</div>
+                    <div style={{fontSize:'0.7rem',color:'var(--text3)',marginBottom:8}}>{f.water}</div>
+                    
+                    {qty === 0 ? (
+                      <button onClick={()=>updateFish(f.id, 1)} style={{background:'var(--bg3)',border:'1px solid var(--border)',color:'var(--text)',fontSize:'0.75rem',padding:'4px 0',width:'100%',borderRadius:6,cursor:'pointer'}}>Add to tank</button>
+                    ) : (
+                      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',background:'var(--bg)',borderRadius:6,padding:'2px',border:'1px solid var(--border2)'}}>
+                        <button onClick={()=>updateFish(f.id, -1)} style={{background:'none',border:'none',color:'var(--text)',cursor:'pointer',width:24,height:24,display:'flex',alignItems:'center',justifyContent:'center'}}>-</button>
+                        <span style={{fontSize:'0.8rem',fontWeight:700,width:20}}>{qty}</span>
+                        <button onClick={()=>updateFish(f.id, 1)} style={{background:'none',border:'none',color:'var(--text)',cursor:'pointer',width:24,height:24,display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+            <button onClick={() => { if(totalFishes===0){toast.error('Select at least one fish first');return} setStep(2) }}
               style={{background:'linear-gradient(135deg,var(--cyan),var(--teal))',color:'#060d1a',border:'none',fontFamily:'Syne,sans-serif',fontWeight:700,padding:'12px 28px',borderRadius:10,cursor:'pointer',fontSize:'0.95rem'}}>
               Continue →
             </button>
@@ -127,17 +183,22 @@ export default function Setup() {
         {/* Step 3 */}
         {step === 3 && (
           <div>
-            <p style={{fontSize:'0.85rem',color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:16}}>Step 3 — Confirm & Create</p>
+            <p style={{fontSize:'0.85rem',color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:16}}>Step 3 — {isEditing ? 'Confirm & Save' : 'Confirm & Create'}</p>
             <div style={{background:'var(--card)',border:'1px solid var(--border)',borderRadius:'var(--radius)',padding:28,textAlign:'center',marginBottom:20}}>
-              <div style={{fontSize:'3rem',marginBottom:12}}>{selectedFish?.emoji}</div>
-              <h3 style={{fontSize:'1.2rem',marginBottom:8}}>{form.name || 'My Tank'}</h3>
-              <p style={{color:'var(--text2)',fontSize:'0.9rem'}}>{selectedFish?.name} · {form.size} · {form.waterType}</p>
-              <p style={{color:'var(--text3)',fontSize:'0.82rem',marginTop:8}}>Default reminders for feeding, water changes, and filter cleaning will be auto-created.</p>
+              <div style={{display:'flex',justifyContent:'center',gap:8,fontSize:'2.5rem',marginBottom:12,flexWrap:'wrap'}}>
+                {Object.entries(fishes).slice(0,5).map(([id]) => (
+                  <span key={id}>{FISH_DB.find(x => x.id === id)?.emoji}</span>
+                ))}
+                {Object.keys(fishes).length > 5 && <span style={{fontSize:'1.5rem',display:'flex',alignItems:'center'}}>+</span>}
+              </div>
+              <h3 style={{fontSize:'1.2rem',marginBottom:8}}>{form.name || 'My Community Tank'}</h3>
+              <p style={{color:'var(--text2)',fontSize:'0.9rem'}}>{totalFishes} fish ({Object.keys(fishes).length} species) · {form.size} · {form.waterType}</p>
+              <p style={{color:'var(--text3)',fontSize:'0.82rem',marginTop:8}}>{isEditing ? 'All dashboard AI calculations will automatically update.' : 'Default reminders for feeding, water changes, and filter cleaning will be auto-created.'}</p>
             </div>
             <div style={{display:'flex',gap:12}}>
               <button onClick={()=>setStep(2)} style={{background:'var(--card)',border:'1px solid var(--border)',color:'var(--text2)',padding:'12px 20px',borderRadius:10,cursor:'pointer',fontSize:'0.95rem'}}>← Back</button>
               <button onClick={handleFinish} disabled={loading} style={{background:'linear-gradient(135deg,var(--cyan),var(--teal))',color:'#060d1a',border:'none',fontFamily:'Syne,sans-serif',fontWeight:700,padding:'12px 28px',borderRadius:10,cursor:'pointer',fontSize:'0.95rem',opacity:loading?0.7:1}}>
-                {loading ? 'Creating...' : '🎉 Create Tank'}
+                {loading ? (isEditing ? 'Saving...' : 'Creating...') : (isEditing ? '💾 Save Changes' : '🎉 Create Tank')}
               </button>
             </div>
           </div>

@@ -32,6 +32,7 @@ const AppRoutes = () => {
         <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/setup" element={<ProtectedRoute><Setup /></ProtectedRoute>} />
+        <Route path="/edit-tank/:id" element={<ProtectedRoute><Setup /></ProtectedRoute>} />
         <Route path="/diagnose" element={<ProtectedRoute><Diagnose /></ProtectedRoute>} />
         <Route path="/shop" element={<ProtectedRoute><Shop /></ProtectedRoute>} />
         <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />

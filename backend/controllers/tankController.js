@@ -3,8 +3,8 @@ const Reminder = require('../models/Reminder');
 
 const createTank = async (req, res) => {
   try {
-    const { name, fishId, fishName, fishEmoji, size, waterType } = req.body;
-    const tank = await Tank.create({ user: req.user._id, name, fishId, fishName, fishEmoji, size, waterType });
+    const { name, fishes, size, waterType } = req.body;
+    const tank = await Tank.create({ user: req.user._id, name, fishes, size, waterType });
 
     // Auto-create default reminders
     const now = new Date();
@@ -50,4 +50,22 @@ const deleteTank = async (req, res) => {
   }
 };
 
-module.exports = { createTank, getTanks, getTank, deleteTank };
+const updateTank = async (req, res) => {
+  try {
+    const { name, size, waterType, fishes } = req.body;
+    let tank = await Tank.findOne({ _id: req.params.id, user: req.user._id });
+    if (!tank) return res.status(404).json({ message: 'Tank not found' });
+
+    if (name) tank.name = name;
+    if (size) tank.size = size;
+    if (waterType) tank.waterType = waterType;
+    if (fishes) tank.fishes = fishes;
+
+    await tank.save();
+    res.json(tank);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { createTank, getTanks, getTank, deleteTank, updateTank };

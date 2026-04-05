@@ -32,6 +32,13 @@ export default function Diagnose() {
   const [diagnosing, setDiagnosing] = useState(false)
   const [result, setResult] = useState(null)
   const [history, setHistory] = useState([])
+  const [selectedSpecies, setSelectedSpecies] = useState(null)
+
+  const tankFishes = activeTank?.fishes?.length > 0 
+    ? activeTank.fishes 
+    : [{ fishId: activeTank?.fishId || 'unknown', name: activeTank?.fishName || 'Your Fish', emoji: activeTank?.fishEmoji || '🐠', quantity: 1 }]
+  
+  const targetFish = selectedSpecies || (tankFishes[0] || {})
 
   useEffect(() => { if (activeTank) fetchHistory() }, [activeTank])
 
@@ -50,7 +57,7 @@ export default function Diagnose() {
     setDiagnosing(true)
     setResult(null)
     try {
-      const { data } = await axios.post('/api/diagnose', { tankId: activeTank._id, symptoms: selected })
+      const { data } = await axios.post('/api/diagnose', { tankId: activeTank._id, symptoms: selected, fishName: targetFish.name })
       setResult(data)
       fetchHistory()
       toast.success('🔬 Diagnosis complete!')
@@ -70,7 +77,23 @@ export default function Diagnose() {
     <div style={{paddingTop:72,minHeight:'100vh',padding:'72px 24px 40px'}}>
       <div style={{maxWidth:760,margin:'0 auto'}}>
         <h2 style={{fontSize:'1.8rem',marginBottom:8}}>Disease Diagnosis 🔬</h2>
-        <p style={{color:'var(--text2)',marginBottom:20}}>Select every symptom you notice. Our AI will identify the disease and give you a treatment plan for your <strong style={{color:'var(--cyan)'}}>{activeTank.fishEmoji} {activeTank.fishName}</strong>.</p>
+        <p style={{color:'var(--text2)',marginBottom:20}}>Select every symptom you notice. Our AI will identify the disease and give you a treatment plan for your <strong style={{color:'var(--cyan)'}}>{targetFish.emoji} {targetFish.name}</strong>.</p>
+
+        {tankFishes.length > 1 && (
+          <div style={{marginBottom:24}}>
+            <p style={{fontSize:'0.85rem',color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:12}}>1. Select Sick Fish</p>
+            <div style={{display:'flex',gap:10,overflowX:'auto',paddingBottom:8}}>
+              {tankFishes.map(f => (
+                <div key={f.fishId} onClick={() => setSelectedSpecies(f)}
+                  style={{background:targetFish.fishId===f.fishId?'rgba(0,212,255,0.08)':'var(--card)',border:`1.5px solid ${targetFish.fishId===f.fishId?'var(--cyan)':'var(--border)'}`,borderRadius:'var(--radius2)',padding:'10px 18px',cursor:'pointer',whiteSpace:'nowrap',color:targetFish.fishId===f.fishId?'var(--text)':'var(--text2)',fontWeight:targetFish.fishId===f.fishId?600:400,transition:'all 0.2s'}}>
+                  {f.emoji} {f.name}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <p style={{fontSize:'0.85rem',color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:12}}>{tankFishes.length > 1 ? '2. Select Symptoms' : 'Symptoms'}</p>
 
         {/* Symptom Grid */}
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(190px,1fr))',gap:10,marginBottom:20}}>
@@ -98,7 +121,7 @@ export default function Diagnose() {
         {result && (
           <div style={{background:'var(--card)',border:'1.5px solid var(--border2)',borderRadius:'var(--radius)',padding:24,marginBottom:24}}>
             <div style={{fontFamily:'Syne,sans-serif',fontSize:'1.3rem',fontWeight:700,color:'var(--coral)',marginBottom:4}}>{result.disease}</div>
-            <div style={{fontSize:'0.82rem',color:'var(--text2)',marginBottom:4}}>Confidence: {result.confidence}% · Fish: {activeTank.fishEmoji} {result.fishName}</div>
+            <div style={{fontSize:'0.82rem',color:'var(--text2)',marginBottom:4}}>Confidence: {result.confidence}% · Fish: {targetFish.emoji} {result.fishName}</div>
             {result.aiResponse && <p style={{fontSize:'0.86rem',color:'var(--text2)',lineHeight:1.7,marginBottom:16,padding:'10px 14px',background:'rgba(0,212,255,0.05)',borderRadius:8,borderLeft:'3px solid var(--cyan)'}}>{result.aiResponse}</p>}
 
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>

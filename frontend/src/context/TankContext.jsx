@@ -30,6 +30,13 @@ export const TankProvider = ({ children }) => {
     return data
   }
 
+  const updateTank = async (id, tankData) => {
+    const { data } = await axios.patch(`/api/tanks/${id}`, tankData)
+    setTanks(prev => prev.map(t => t._id === id ? data : t))
+    if (activeTank?._id === id) setActiveTank(data)
+    return data
+  }
+
   const deleteTank = async (id) => {
     await axios.delete(`/api/tanks/${id}`)
     setTanks(prev => prev.filter(t => t._id !== id))
@@ -37,7 +44,7 @@ export const TankProvider = ({ children }) => {
   }
 
   return (
-    <TankContext.Provider value={{ tanks, activeTank, setActiveTank, addTank, deleteTank, fetchTanks }}>
+    <TankContext.Provider value={{ tanks, activeTank, setActiveTank, addTank, updateTank, deleteTank, fetchTanks }}>
       {children}
     </TankContext.Provider>
   )
