@@ -1,4 +1,4 @@
-# AquaGuard 🐠
+# AquaCare 🐠
 ### Smart Aquarium Health Monitor
 
 A full-stack web application that helps fish owners monitor their aquarium health, diagnose diseases using AI, and manage their fish care routine.
@@ -54,13 +54,8 @@ aquaguard/
 ### Step 1 — Clone & Install
 
 ```bash
-# Install backend dependencies
-cd backend
-npm install
-
-# Install frontend dependencies
-cd ../frontend
-npm install
+# Install all dependencies (root, backend, frontend)
+npm run install:all
 ```
 
 ---
@@ -84,19 +79,12 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 ### Step 3 — Run the App
 
-Open two terminals:
+Open a single terminal in the root directory:
 
-**Terminal 1 — Backend:**
 ```bash
-cd backend
 npm run dev
 ```
-
-**Terminal 2 — Frontend:**
-```bash
-cd frontend
-npm run dev
-```
+*(This uses concurrently to spin up both the frontend and backend servers together!)*
 
 Open http://localhost:5173 in your browser.
 
@@ -121,6 +109,7 @@ Open http://localhost:5173 in your browser.
 | GET | /api/reminders | Get reminders | Yes |
 | POST | /api/reminders | Create reminder | Yes |
 | PATCH | /api/reminders/:id/toggle | Toggle reminder | Yes |
+| PATCH | /api/reminders/:id/done | Mark reminder as done & reschedule | Yes |
 | DELETE | /api/reminders/:id | Delete reminder | Yes |
 | GET | /api/fish | Get all fish species | No |
 
@@ -133,8 +122,8 @@ Open http://localhost:5173 in your browser.
 - **AI analysis** — Gemini API analyses each log entry
 - **Disease diagnosis** — 18 symptoms → AI identifies disease with do's and don'ts
 - **Trend charts** — parameter history visualised with Recharts
-- **Smart reminders** — auto-created for feeding, water change, filter clean
-- **Shop** — 23 products across 5 categories
+- **Smart reminders** — auto-created for feeding, water change, filter clean. Includes one-click "Mark as Done" auto-rescheduling!
+- **Shop & Cart** — 23 products across 5 categories, with a globally managed persistent cart system.
 - **Trusted vendors** — local aquarium contacts
 - **JWT authentication** — secure login/register
 - **Multi-tank support** — manage multiple tanks
