@@ -1,0 +1,27 @@
+const SHOP_ITEMS = [
+  { id:1, name:'Nano Cube Tank 20L', cat:'tank', emoji:'🪣', price:1299, desc:'Perfect for Bettas & small fish. Glass front panel with LED.' },
+  { id:2, name:'Classic Bowl Set', cat:'tank', emoji:'🫙', price:499, desc:'Round bowl with pebbles & filter. Customizable color.' },
+  { id:3, name:'Premium 60L Aquarium', cat:'tank', emoji:'🐠', price:3499, desc:'Complete setup with filter, heater & LED lighting.' },
+  { id:4, name:'XL Corner Tank 150L', cat:'tank', emoji:'🌊', price:8999, desc:'Large display tank with built-in sump filter.' },
+  { id:5, name:'Pebble Mix (Natural)', cat:'decor', emoji:'🪨', price:199, desc:'Natural river pebbles, safe for all fish.' },
+  { id:6, name:'Aquatic Plants Set', cat:'decor', emoji:'🌿', price:349, desc:'5 real aquatic plants — Java Fern, Anubias, Moss.' },
+  { id:7, name:'Driftwood Piece', cat:'decor', emoji:'🪵', price:399, desc:'Natural driftwood, pre-boiled and fish-safe.' },
+  { id:8, name:'Castle Decoration', cat:'decor', emoji:'🏰', price:249, desc:'Resin castle hideout, non-toxic.' },
+  { id:9, name:'LED Color Light Strip', cat:'decor', emoji:'💡', price:599, desc:'RGB waterproof strip with remote.' },
+  { id:10, name:'Ich Treatment 100ml', cat:'medicine', emoji:'💊', price:249, desc:'Treats White Spot Disease. Safe for plants.' },
+  { id:11, name:'Fin Rot Guard', cat:'medicine', emoji:'🧪', price:199, desc:'Antibacterial treatment for fin rot.' },
+  { id:12, name:'Aquarium Salt 500g', cat:'medicine', emoji:'🧂', price:129, desc:'Natural salt for stress relief & disease prevention.' },
+  { id:13, name:'Water Conditioner', cat:'medicine', emoji:'💧', price:179, desc:'Removes chlorine & detoxifies ammonia.' },
+  { id:14, name:'Ammonia Detoxifier', cat:'medicine', emoji:'⚗️', price:219, desc:'Emergency ammonia neutralizer.' },
+  { id:15, name:'Tropical Flakes 100g', cat:'food', emoji:'🍽️', price:149, desc:'Balanced diet flakes for all tropical fish.' },
+  { id:16, name:'Betta Pellets 50g', cat:'food', emoji:'🐠', price:199, desc:'High-protein pellets specially for Bettas.' },
+  { id:17, name:'Bloodworm Freeze-dried', cat:'food', emoji:'🪱', price:249, desc:'Premium freeze-dried bloodworms.' },
+  { id:18, name:'Goldfish Granules', cat:'food', emoji:'🐡', price:129, desc:'Sinking granules for goldfish digestive health.' },
+  { id:19, name:'Spirulina Wafers', cat:'food', emoji:'🌱', price:179, desc:'Vegetable wafers for bottom feeders.' },
+  { id:20, name:'Hang-on Filter', cat:'equipment', emoji:'⚙️', price:799, desc:'Quiet HOB filter, 300L/hr.' },
+  { id:21, name:'Digital Thermometer', cat:'equipment', emoji:'🌡️', price:149, desc:'LCD waterproof thermometer. ±0.1°C accuracy.' },
+  { id:22, name:'Aquarium Heater 100W', cat:'equipment', emoji:'🔥', price:549, desc:'Fully submersible glass heater with thermostat.' },
+  { id:23, name:'Air Pump + Stone', cat:'equipment', emoji:'💨', price:299, desc:'Silent air pump with diffuser stone.' },
+];
+
+module.exports = SHOP_ITEMS;
