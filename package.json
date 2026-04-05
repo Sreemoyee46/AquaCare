@@ -1,0 +1,27 @@
+{
+  "name": "aquaguard",
+  "version": "1.0.0",
+  "description": "A full-stack web application that helps fish owners monitor their aquarium health, diagnose diseases using AI, and manage their fish care routine.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sreemoyee46/AquaCare.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Sreemoyee46/AquaCare/issues"
+  },
+  "homepage": "https://github.com/Sreemoyee46/AquaCare#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
