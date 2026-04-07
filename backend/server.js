@@ -21,16 +21,27 @@ app.use('/api/fish', require('./routes/fishRoutes'));
 
 app.get('/', (req, res) => res.json({ message: 'AquaCare API running' }));
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('MongoDB connected');
-    if (process.env.NODE_ENV !== 'production') {
-      app.listen(process.env.PORT || 5000, () =>
-        console.log(`Server running on port ${process.env.PORT || 5000}`)
-      );
-    }
-  })
-  .catch(err => console.error('MongoDB error:', err));
+const mongoUri = process.env.MONGO_URI;
+if (mongoUri) {
+  mongoose.connect(mongoUri)
+    .then(() => {
+      console.log('MongoDB connected');
+      if (process.env.NODE_ENV !== 'production') {
+        app.listen(process.env.PORT || 5000, () =>
+          console.log(`Server running on port ${process.env.PORT || 5000}`)
+        );
+      }
+    })
+    .catch(err => console.error('MongoDB error:', err));
+} else {
+  console.error('CRITICAL: MONGO_URI is not defined. The API will not work properly!');
+  if (process.env.NODE_ENV !== 'production') {
+    app.listen(process.env.PORT || 5000, () =>
+      console.log(`Server running on port ${process.env.PORT || 5000} (without DB)`)
+    );
+  }
+}
+
 
 // Export the Express API for Vercel
 module.exports = app;
