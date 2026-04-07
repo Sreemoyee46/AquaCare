@@ -1,0 +1,8 @@
+<parameter name="content"># Add Fish Quantity Feature
+
+- [ ] 1. Update backend/models/Tank.js - add quantity field
+- [ ] 2. Update backend/controllers/tankController.js - handle quantity in createTank
+- [ ] 3. Update frontend/src/pages/Setup.jsx - add quantity UI (+/- buttons) and fix style warning
+- [ ] 4. Update frontend/src/pages/Dashboard.jsx - display fish quantity
+- [ ] 5. Test creation/display, restart servers
+- [ ] 6. Complete</parameter>
