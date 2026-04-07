@@ -19,6 +19,7 @@ app.use('/api/diagnose', require('./routes/diagnoseRoutes'));
 app.use('/api/shop', require('./routes/shopRoutes'));
 app.use('/api/reminders', require('./routes/reminderRoutes'));
 app.use('/api/fish', require('./routes/fishRoutes'));
+app.use('/api/bookings', require('./routes/bookingRoutes'));
 
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

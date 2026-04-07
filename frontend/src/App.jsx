@@ -13,6 +13,7 @@ import Shop from './pages/Shop'
 import Reminders from './pages/Reminders'
 import Profile from './pages/Profile'
 import Cart from './pages/Cart'
+import Caretakers from './pages/Caretakers'
 import { CartProvider } from './context/CartContext'
 
 const ProtectedRoute = ({ children }) => {
@@ -35,6 +36,7 @@ const AppRoutes = () => {
         <Route path="/edit-tank/:id" element={<ProtectedRoute><Setup /></ProtectedRoute>} />
         <Route path="/diagnose" element={<ProtectedRoute><Diagnose /></ProtectedRoute>} />
         <Route path="/shop" element={<ProtectedRoute><Shop /></ProtectedRoute>} />
+        <Route path="/caretakers" element={<ProtectedRoute><Caretakers /></ProtectedRoute>} />
         <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
         <Route path="/reminders" element={<ProtectedRoute><Reminders /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
