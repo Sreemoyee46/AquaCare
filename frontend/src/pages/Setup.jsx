@@ -122,7 +122,7 @@ export default function Setup() {
                 const qty = fishes[f.id] || 0
                 return (
                   <div key={f.id}
-                    style={{background:qty>0?'rgba(0,212,255,0.08)':'var(--card)',border:`1.5px solid ${qty>0?'var(--cyan)':'var(--border)'}`,borderRadius:'var(--radius2)',padding:'14px 10px',textAlign:'center',transition:'all 0.2s',position:'relative'}}>
+                    style={{background:qty>0?'rgba(0,212,255,0.08)':'var(--card)',border:`1.5px solid ${qty>0?'var(--cyan)':'var(--border)'}`,borderRadius:'var(--radius2)',padding:'14px 10px',textAlign:'center',transition:'all 0.2s',position:'relative',display:'flex',flexDirection:'column',justifyContent:'space-between',minHeight:160}}>
                     <div style={{fontSize:'1.8rem',marginBottom:6}}>{f.emoji}</div>
                     <div style={{fontSize:'0.82rem',fontWeight:600,marginBottom:3}}>{f.name}</div>
                     <div style={{fontSize:'0.7rem',color:diffColor[f.difficulty]}}>{f.difficulty}</div>
