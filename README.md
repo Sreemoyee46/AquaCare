@@ -54,6 +54,10 @@ aquaguard/
 ### Step 1 — Clone & Install
 
 ```bash
+# Clone the repository
+git clone https://github.com/HackIndiaXYZ/hackindia-spark-6-ncr-central-region-ai-innovators.git
+cd hackindia-spark-6-ncr-central-region-ai-innovators
+
 # Install all dependencies (root, backend, frontend)
 npm run install:all
 ```
