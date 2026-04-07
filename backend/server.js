@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 
 dotenv.config();
 
@@ -19,7 +20,13 @@ app.use('/api/shop', require('./routes/shopRoutes'));
 app.use('/api/reminders', require('./routes/reminderRoutes'));
 app.use('/api/fish', require('./routes/fishRoutes'));
 
-app.get('/', (req, res) => res.json({ message: 'AquaCare API running' }));
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Send all other requests to the React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
 
 const mongoUri = process.env.MONGO_URI;
 if (mongoUri) {
@@ -27,8 +34,9 @@ if (mongoUri) {
     .then(() => {
       console.log('MongoDB connected');
       if (process.env.NODE_ENV !== 'production') {
-        app.listen(process.env.PORT || 5000, () =>
-          console.log(`Server running on port ${process.env.PORT || 5000}`)
+        const port = process.env.PORT || 5000;
+        app.listen(port, () =>
+          console.log(`Server running at http://localhost:${port}`)
         );
       }
     })
@@ -36,12 +44,12 @@ if (mongoUri) {
 } else {
   console.error('CRITICAL: MONGO_URI is not defined. The API will not work properly!');
   if (process.env.NODE_ENV !== 'production') {
-    app.listen(process.env.PORT || 5000, () =>
-      console.log(`Server running on port ${process.env.PORT || 5000} (without DB)`)
+    const port = process.env.PORT || 5000;
+    app.listen(port, () =>
+      console.log(`Server running on port ${port} (without DB)`)
     );
   }
 }
-
 
 // Export the Express API for Vercel
 module.exports = app;
